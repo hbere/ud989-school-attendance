@@ -10,138 +10,76 @@ let model = {
         if (!localStorage.students) {
             localStorage.students = JSON.stringify([]);
         }
-        // Initialize attendance records
-        if (!localStorage.attendance) {
-            localStorage.attendance = JSON.stringify([]);
-        }
     },
     addStudent: function (student) {
         let data = JSON.parse(localStorage.students);
         data.push(student);
         localStorage.students = JSON.stringify(data);
     },
-    addAttendance: function (attendanceRecord) {
-        let data = JSON.parse(localStorage.attendance);
-        data.push(attendanceRecord);
-        localStorage.attendance = JSON.stringify(data);
+    allStudents: function () {
+        let data = JSON.parse(localStorage.students);
+        return data;
     }
 }
 
 let octopus = {
     init: function () {
+        // Clear local storage
+        localStorage.removeItem('students');
         // Initialize model
         model.init();
-        // Add students
+        // Add all students
+        octopus.addAllStudents();
+        // Initialize view
+        view.init(model.allStudents());
+    },
+    addAllStudents: function () {
         let students = [
-            { id: 1, name: 'Slappy the Frog' },
-            { id: 2, name: 'Lilly the Lizard' },
-            { id: 3, name: 'Paulrus the Walrus' },
-            { id: 4, name: 'Gregory the Goat' },
-            { id: 5, name: 'Adam the Anaconda' }
+            { id: 1, name: 'Slappy the Frog', absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 2, name: 'Lilly the Lizard', absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 3, name: 'Paulrus the Walrus', absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 4, name: 'Gregory the Goat', absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 5, name: 'Adam the Anaconda', absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
         ];
         for (student of students) {
             model.addStudent(student);
         }
-        // Add attendance records
-        let attendance = [
-            { id: 1, absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 2, absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 3, absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 4, absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 5, absences: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-        ];
-        for (record of attendance) {
-            model.addAttendance(record);
+    },
+    countMissing: function (student) {
+        let totalAbsences = 0;
+        student.absences.forEach(record => {
+            totalAbsences += record;
+        });
+        return totalAbsences;
+    },
+    clickHandler: function () {
+        // 
+    },
+    updateTotalMissed (student, totalMissed) {
+        // Count total missed per student
+        let students = model.allStudents();
+        let missed = [];
+        for (student of students) {
+            missed.push(octopus.countMissing(student));
         }
+        // Update total missed column
     }
 }
 
 let view = {
-    init: function () {
-        console.log(hi);
+    init: function (students) {
+        // Generate table
+        let html;
+        students.forEach(student => {
+            html = '<tr class="student">';
+            html += `<td class="name-col">${student.name}</td>`;
+            student.absences.forEach(record => {
+                html += `<td class="attend-col"><input type="checkbox"></td>`;
+            });
+            html += `<td class="missed-col">0</td></tr>`;
+            document.querySelector('tbody').insertAdjacentHTML('beforeend', html);
+        });
     }
 }
 
 octopus.init();
-
-
-
-//     (function () {
-//         if (!localStorage.attendance) {
-//             console.log('Creating attendance records...');
-//             function getRandom() {
-//                 return (Math.random() >= 0.5);
-//             }
-
-//             var nameColumns = $('tbody .name-col'),
-//                 attendance = {};
-
-//             nameColumns.each(function () {
-//                 var name = this.innerText;
-//                 attendance[name] = [];
-
-//                 for (var i = 0; i <= 11; i++) {
-//                     attendance[name].push(getRandom());
-//                 }
-//             });
-
-//             localStorage.attendance = JSON.stringify(attendance);
-//         }
-//     }());
-
-
-// /* STUDENT APPLICATION */
-// $(function () {
-//     var attendance = JSON.parse(localStorage.attendance),
-//         $allMissed = $('tbody .missed-col'),
-//         $allCheckboxes = $('tbody input');
-
-//     // Count a student's missed days
-//     function countMissing() {
-//         $allMissed.each(function () {
-//             var studentRow = $(this).parent('tr'),
-//                 dayChecks = $(studentRow).children('td').children('input'),
-//                 numMissed = 0;
-
-//             dayChecks.each(function () {
-//                 if (!$(this).prop('checked')) {
-//                     numMissed++;
-//                 }
-//             });
-
-//             $(this).text(numMissed);
-//         });
-//     }
-
-//     // Check boxes, based on attendace records
-//     $.each(attendance, function (name, days) {
-//         var studentRow = $('tbody .name-col:contains("' + name + '")').parent('tr'),
-//             dayChecks = $(studentRow).children('.attend-col').children('input');
-
-//         dayChecks.each(function (i) {
-//             $(this).prop('checked', days[i]);
-//         });
-//     });
-
-//     // When a checkbox is clicked, update localStorage
-//     $allCheckboxes.on('click', function () {
-//         var studentRows = $('tbody .student'),
-//             newAttendance = {};
-
-//         studentRows.each(function () {
-//             var name = $(this).children('.name-col').text(),
-//                 $allCheckboxes = $(this).children('td').children('input');
-
-//             newAttendance[name] = [];
-
-//             $allCheckboxes.each(function () {
-//                 newAttendance[name].push($(this).prop('checked'));
-//             });
-//         });
-
-//         countMissing();
-//         localStorage.attendance = JSON.stringify(newAttendance);
-//     });
-
-//     countMissing();
-// }());
