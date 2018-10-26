@@ -33,14 +33,14 @@ let octopus = {
         model.init();
         view.init(model.getStudents());
     },
-    updateAttendance: function (studentID, dayID, record) {
+    updateAttendance: function (studentID, dayID, attendedYN) {
         let students = model.getStudents();
-        students[studentID].attended[dayID] = record;
+        students[studentID].attended[dayID] = attendedYN;
         model.updateStudents(students);
     },
     updateAttendanceTotals() {
         let totalAttended = model.getAttendanceTotals();
-        view.updateTotals(totalAttended);
+        view.updateAttendanceTotals(totalAttended);
     }
 }
 
@@ -68,8 +68,7 @@ let view = {
             octopus.updateAttendanceTotals();
         });
     },
-    updateTotals: function (attendanceTotals) {
-        // Update attendance column
+    updateAttendanceTotals: function (attendanceTotals) {
         let elements = document.getElementsByClassName('att-col-value');
         attendanceTotals.forEach((value, index) => {
             elements[index].innerText = value;
