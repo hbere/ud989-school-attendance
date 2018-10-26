@@ -18,7 +18,7 @@ let model = {
     updateStudents: function (students) {
         localStorage.students = JSON.stringify(students);
     },
-    countAttendance: function () {
+    getAttendanceTotals: function () {
         let students = JSON.parse(localStorage.students);
         let totalAttended = [];
         for (student of students) {
@@ -38,8 +38,8 @@ let octopus = {
         students[studentID].attended[dayID] = record;
         model.updateStudents(students);
     },
-    updateTotalAttended() {
-        let totalAttended = model.countAttendance();
+    updateAttendanceTotals() {
+        let totalAttended = model.getAttendanceTotals();
         view.updateTotals(totalAttended);
     }
 }
@@ -65,7 +65,7 @@ let view = {
             } else {
                 octopus.updateAttendance(studentID, dayID, 0);
             }
-            octopus.updateTotalAttended();
+            octopus.updateAttendanceTotals();
         });
     },
     updateTotals: function (attendanceTotals) {
