@@ -1,21 +1,21 @@
-/* STUDENTS IGNORE THIS FUNCTION
- * All this does is create an initial
- * attendance record if one is not found
- * within localStorage.
- */
+// 10/26/18
+// app.js
 
 let model = {
-    init: function () {
-        localStorage.students = JSON.stringify([]); // start fresh
-    },
-    addStudent: function (student) {
-        let data = JSON.parse(localStorage.students);
-        data.push(student);
-        localStorage.students = JSON.stringify(data);
+    init: function (students) {
+        localStorage.students = JSON.stringify(students);
     },
     allStudents: function () {
         let data = JSON.parse(localStorage.students);
         return data;
+    },
+    countAttended: function (student) {
+        // counts # classes student has attended
+        let totalAttended = 0;
+        student.attended.forEach(record => {
+            totalAttended += record;
+        });
+        return totalAttended;
     },
     updateAttendance: function (studentID, dayID, record) {
         let data = JSON.parse(localStorage.students);
@@ -26,15 +26,7 @@ let model = {
 
 let octopus = {
     init: function () {
-        // MODEL
-        model.init(); // initialize
-        this.addAllStudents(); // add all students
-        // VIEW
-        view.init(model.allStudents()); // initialize
-        this.checkboxHandler(); // add checkbox handlers
-    },
-    addAllStudents: function () {
-        // adds all students to model
+        // DATA
         let students = [
             { id: 0, name: 'Slappy the Frog', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
             { id: 1, name: 'Lilly the Lizard', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
@@ -42,17 +34,11 @@ let octopus = {
             { id: 3, name: 'Gregory the Goat', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
             { id: 4, name: 'Adam the Anaconda', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
         ];
-        for (student of students) {
-            model.addStudent(student);
-        }
-    },
-    countAttended: function (student) {
-        // counts # classes student has attended
-        let totalAttended = 0;
-        student.attended.forEach(record => {
-            totalAttended += record;
-        });
-        return totalAttended;
+        // MODEL
+        model.init(students);
+        // VIEW
+        view.init(students);
+        this.checkboxHandler(); // add checkbox handlers
     },
     checkboxHandler: function () {
         // adds handler to all checkboxes
@@ -99,6 +85,7 @@ let view = {
         });
     },
     updateTotals: function (attendanceTotals) {
+        // Update attendance column
         let elements = document.getElementsByClassName('att-col-value');
         let i = 0;
         for (let element of elements) {
