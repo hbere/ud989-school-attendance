@@ -19,12 +19,7 @@ let model = {
         return JSON.parse(localStorage.students);
     },
     countAttended: function (student) {
-        // counts # classes student has attended
-        let totalAttended = 0;
-        student.attended.forEach(record => {
-            totalAttended += record;
-        });
-        return totalAttended;
+        return student.attended.reduce((a, b) => a + b);
     }
 }
 
@@ -64,13 +59,13 @@ let view = {
             html += `<td class="att-col-value">0</td></tr>`;
             document.querySelector('tbody').insertAdjacentHTML('beforeend', html);
         });
-        // adds handler to all checkboxes
+        // Add checkbox handler
         document.addEventListener('change', function (event) {
             let studentID = Number(event.target.getAttribute("studentid"));
             let dayID = Number(event.target.getAttribute("dayid"));
             if (event.target.checked) {
                 octopus.updateAttendance(studentID, dayID, 1);
-            } else if (!event.target.checked) {
+            } else {
                 octopus.updateAttendance(studentID, dayID, 0);
             }
             octopus.updateTotalAttended();
