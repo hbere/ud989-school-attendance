@@ -18,8 +18,13 @@ let model = {
     updateStudents: function (students) {
         localStorage.students = JSON.stringify(students);
     },
-    countAttended: function (student) {
-        return student.attended.reduce((a, b) => a + b);
+    getAttendance: function () {
+        let students = JSON.parse(localStorage.students);
+        let totalAttended = [];
+        for (student of students) {
+            totalAttended.push(student.attended.reduce((a, b) => a + b));
+        }
+        return totalAttended;
     }
 }
 
@@ -34,14 +39,7 @@ let octopus = {
         model.updateStudents(students);
     },
     updateTotalAttended() {
-        // Count total missed per student
-        let students = model.getStudents();
-        let totalAttended = [];
-        // Update total missed column
-        for (student of students) {
-            totalAttended[student.id] = model.countAttended(student);
-        }
-        // Update view
+        let totalAttended = model.getAttendance();
         view.updateTotals(totalAttended);
     }
 }
