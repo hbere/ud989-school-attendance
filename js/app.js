@@ -18,7 +18,7 @@ let model = {
     updateStudents: function (students) {
         localStorage.students = JSON.stringify(students);
     },
-    getAttendance: function () {
+    countAttendance: function () {
         let students = JSON.parse(localStorage.students);
         let totalAttended = [];
         for (student of students) {
@@ -39,7 +39,7 @@ let octopus = {
         model.updateStudents(students);
     },
     updateTotalAttended() {
-        let totalAttended = model.getAttendance();
+        let totalAttended = model.countAttendance();
         view.updateTotals(totalAttended);
     }
 }
@@ -47,11 +47,10 @@ let octopus = {
 let view = {
     init: function (students) {
         // Generate table
-        let html;
         students.forEach(student => {
-            html = '<tr class="student">';
+            let html = '<tr class="student">';
             html += `<td class="name-col">${student.name}</td>`;
-            student.attended.forEach((record, index) => {
+            student.attended.forEach((value, index) => {
                 html += `<td class="attend-col"><input type="checkbox" studentid="${student.id}" dayid="${index}"></td>`;
             });
             html += `<td class="att-col-value">0</td></tr>`;
