@@ -12,11 +12,11 @@ let model = {
         ];
         localStorage.students = JSON.stringify(students);
     },
-    updateStudents: function (students) {
-        localStorage.students = JSON.stringify(students);
-    },
     getStudents: function () {
         return JSON.parse(localStorage.students);
+    },
+    updateStudents: function (students) {
+        localStorage.students = JSON.stringify(students);
     },
     countAttended: function (student) {
         return student.attended.reduce((a, b) => a + b);
