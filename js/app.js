@@ -6,10 +6,7 @@
 
 let model = {
     init: function () {
-        // Initiatialize students records
-        if (!localStorage.students) {
-            localStorage.students = JSON.stringify([]);
-        }
+        localStorage.students = JSON.stringify([]); // start fresh
     },
     addStudent: function (student) {
         let data = JSON.parse(localStorage.students);
@@ -20,28 +17,21 @@ let model = {
         let data = JSON.parse(localStorage.students);
         return data;
     },
-    singleStudent: function (studentID) {
+    updateAttendance: function (studentID, dayID, record) {
         let data = JSON.parse(localStorage.students);
-        let student = data[studentID];
-        return student;
-    },
-    updateAllStudents: function (data) {
+        data[studentID].attended[dayID] = record;
         localStorage.students = JSON.stringify(data);
-    },
-    updateSingleStudent: function (student) {
-        localStorage.students[student.id] = JSON.stringify(student);
-    },
+    }
 }
 
 let octopus = {
     init: function () {
         // MODEL
-        localStorage.removeItem('students'); // clear local storage
         model.init(); // initialize
         this.addAllStudents(); // add all students
         // VIEW
         view.init(model.allStudents()); // initialize
-        this.checkboxHandler(); // add click handlers
+        this.checkboxHandler(); // add checkbox handlers
     },
     addAllStudents: function () {
         // adds all students to model
@@ -66,16 +56,14 @@ let octopus = {
     },
     checkboxHandler: function () {
         // adds handler to all checkboxes
-        let students = model.allStudents();
         document.addEventListener('change', function (event) {
             let studentID = Number(event.target.getAttribute("studentid"));
             let dayID = Number(event.target.getAttribute("dayid"));
             if (event.target.checked) {
-                students[studentID].attended[dayID] = 1;
+                model.updateAttendance(studentID, dayID, 1);
             } else if (!event.target.checked) {
-                students[studentID].attended[dayID] = 0;
+                model.updateAttendance(studentID, dayID, 0);
             }
-            model.updateAllStudents(students);
             octopus.updateTotalAttended();
         });
     },
@@ -103,18 +91,18 @@ let view = {
         students.forEach(student => {
             html = '<tr class="student">';
             html += `<td class="name-col">${student.name}</td>`;
-            student.attended.forEach( (record, index) => {
+            student.attended.forEach((record, index) => {
                 html += `<td class="attend-col"><input type="checkbox" studentid="${student.id}" dayid="${index}"></td>`;
             });
             html += `<td class="att-col-value">0</td></tr>`;
             document.querySelector('tbody').insertAdjacentHTML('beforeend', html);
         });
     },
-    updateTotals: function (totals) {
+    updateTotals: function (attendanceTotals) {
         let elements = document.getElementsByClassName('att-col-value');
         let i = 0;
         for (let element of elements) {
-            element.innerText = totals[i];
+            element.innerText = attendanceTotals[i];
             i++;
         };
     }
