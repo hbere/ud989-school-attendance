@@ -2,12 +2,21 @@
 // app.js
 
 let model = {
-    init: function (students) {
+    init: function () {
+        let students = [
+            { id: 0, name: 'Slappy the Frog', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 1, name: 'Lilly the Lizard', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 2, name: 'Paulrus the Walrus', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 3, name: 'Gregory the Goat', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { id: 4, name: 'Adam the Anaconda', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+        ];
         localStorage.students = JSON.stringify(students);
     },
-    allStudents: function () {
-        let data = JSON.parse(localStorage.students);
-        return data;
+    updateStudents: function (students) {
+        localStorage.students = JSON.stringify(students);
+    },
+    getStudents: function () {
+        return JSON.parse(localStorage.students);
     },
     countAttended: function (student) {
         // counts # classes student has attended
@@ -16,56 +25,28 @@ let model = {
             totalAttended += record;
         });
         return totalAttended;
-    },
-    updateAttendance: function (studentID, dayID, record) {
-        let data = JSON.parse(localStorage.students);
-        data[studentID].attended[dayID] = record;
-        localStorage.students = JSON.stringify(data);
     }
 }
 
 let octopus = {
     init: function () {
-        // DATA
-        let students = [
-            { id: 0, name: 'Slappy the Frog', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 1, name: 'Lilly the Lizard', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 2, name: 'Paulrus the Walrus', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 3, name: 'Gregory the Goat', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            { id: 4, name: 'Adam the Anaconda', attended: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
-        ];
-        // MODEL
-        model.init(students);
-        // VIEW
-        view.init(students);
-        this.checkboxHandler(); // add checkbox handlers
+        model.init();
+        view.init(model.getStudents());
     },
-    checkboxHandler: function () {
-        // adds handler to all checkboxes
-        document.addEventListener('change', function (event) {
-            let studentID = Number(event.target.getAttribute("studentid"));
-            let dayID = Number(event.target.getAttribute("dayid"));
-            if (event.target.checked) {
-                model.updateAttendance(studentID, dayID, 1);
-            } else if (!event.target.checked) {
-                model.updateAttendance(studentID, dayID, 0);
-            }
-            octopus.updateTotalAttended();
-        });
+    updateAttendance: function (studentID, dayID, record) {
+        let students = model.getStudents();
+        students[studentID].attended[dayID] = record;
+        model.updateStudents(students);
     },
     updateTotalAttended() {
         // Count total missed per student
-        let students = model.allStudents();
-        let missed = [];
+        let students = model.getStudents();
         let totalAttended = [];
-        for (student of students) {
-            missed.push(octopus.countAttended(student));
-        }
         // Update total missed column
         for (student of students) {
-            totalAttended[student.id] = student.attended.reduce((a, b) => a + b, 0);
+            totalAttended[student.id] = model.countAttended(student);
         }
-        // Update final (sum) column
+        // Update view
         view.updateTotals(totalAttended);
     }
 }
@@ -83,15 +64,24 @@ let view = {
             html += `<td class="att-col-value">0</td></tr>`;
             document.querySelector('tbody').insertAdjacentHTML('beforeend', html);
         });
+        // adds handler to all checkboxes
+        document.addEventListener('change', function (event) {
+            let studentID = Number(event.target.getAttribute("studentid"));
+            let dayID = Number(event.target.getAttribute("dayid"));
+            if (event.target.checked) {
+                octopus.updateAttendance(studentID, dayID, 1);
+            } else if (!event.target.checked) {
+                octopus.updateAttendance(studentID, dayID, 0);
+            }
+            octopus.updateTotalAttended();
+        });
     },
     updateTotals: function (attendanceTotals) {
         // Update attendance column
         let elements = document.getElementsByClassName('att-col-value');
-        let i = 0;
-        for (let element of elements) {
-            element.innerText = attendanceTotals[i];
-            i++;
-        };
+        attendanceTotals.forEach((value, index) => {
+            elements[index].innerText = value;
+        });
     }
 }
 
