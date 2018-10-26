@@ -19,13 +19,13 @@ input {
 }
 
 /* Column types */
-th.missed-col {
-    background-color: #f00;
+th.att-col {
+    background-color: rgb(31, 94, 1);
 }
 
-td.missed-col {
+td.att-col {
     background-color: #ffecec;
-    color: #f00;
+    color: rgb(31, 94, 1);
     text-align: center;
 }
 
